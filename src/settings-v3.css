@@ -64,7 +64,7 @@
 
 .settings-v3-content input[type='date'] {
   padding: 11px 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: #fafaf6;
 }
 
@@ -100,7 +100,7 @@
 .settings-v3-confirm {
   margin-top: 14px;
   padding: 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .settings-v3-confirm > p {
