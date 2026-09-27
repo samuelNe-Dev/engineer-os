@@ -3,11 +3,9 @@
    can be reviewed independently. */
 
 .today-screen {
-  --green: #27483a;
-  --muted: #6b706a;
-  --today-surface: #eef1e8;
-  --today-surface-strong: #e5eadc;
-  --today-line: #d9ddd3;
+  --today-surface: var(--surface);
+  --today-surface-strong: var(--surface-strong);
+  --today-line: var(--line);
 
   height: calc(100dvh - 84px - env(safe-area-inset-top));
   min-height: 0;
@@ -91,7 +89,7 @@
   flex: none;
   border: 1px solid #e0e4da;
   background: var(--today-surface);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 17px 18px 16px;
   box-shadow: 0 1px 0 rgb(39 72 58 / 0.03);
 }
@@ -168,7 +166,7 @@
 .today-focus .secondary {
   min-height: 48px;
   margin-top: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 620;
 }
