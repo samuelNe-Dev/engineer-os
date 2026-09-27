@@ -61,6 +61,7 @@ test('roadmap opens any week, rest day is distinct, and date changes preserve pr
 }) => {
   await page.getByRole('button', { name: 'Understood. Let’s build.' }).click()
   await page.getByRole('link', { name: 'Roadmap', exact: true }).click()
+  await page.getByRole('button', { name: 'Show what you can do' }).click()
   await page
     .getByRole('button', { name: '24 Interview, reflect, move forward' })
     .click()
@@ -72,9 +73,11 @@ test('roadmap opens any week, rest day is distinct, and date changes preserve pr
   await expect(
     page.getByRole('heading', { name: 'Your first small program' }),
   ).toBeVisible()
-  await page.getByRole('button', { name: 'Sunday, rest day' }).click()
+  await page.getByRole('button', { name: 'Open settings' }).click()
+  await page.getByLabel('Program start date').fill('2026-09-22')
+  await page.getByRole('button', { name: 'Save start date' }).click()
   await expect(
-    page.getByRole('heading', { name: 'Let the week sink in.' }),
+    page.getByRole('heading', { name: 'Let it settle.' }),
   ).toBeVisible()
   await page.getByRole('button', { name: 'Open settings' }).click()
   await page.getByLabel('Program start date').fill('2026-09-21')
@@ -233,4 +236,18 @@ test('failed persistence is visible and does not prevent continued practice', as
   await expect(
     page.getByRole('button', { name: 'Built it. Let’s explain.' }),
   ).toBeVisible()
+})
+
+test('Leo changes animation with the task and respects reduced motion', async ({
+  page,
+}) => {
+  const leo = page.locator('.today-hero .leo-sprite')
+  await expect(leo).toHaveClass(/leo-wave/)
+  await expect(leo).toHaveCSS('animation-name', 'leo-motion')
+  await page.getByRole('button', { name: 'Understood. Let’s build.' }).click()
+  await expect(leo).toHaveClass(/leo-focus/)
+  await page.getByRole('button', { name: 'Built it. Let’s explain.' }).click()
+  await expect(leo).toHaveClass(/leo-waiting/)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect(leo).toHaveCSS('animation-name', 'none')
 })

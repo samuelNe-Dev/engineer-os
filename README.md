@@ -2,10 +2,16 @@
 
 An iPhone-first, offline-capable personal learning app for a 24-week software engineering program. Built on the repository’s existing React 19, TypeScript and Vite configuration; the original `/engineer-os/` GitHub Pages base path is preserved.
 
+## Design preview
+
+| Today | Speak |
+| --- | --- |
+| ![Today screen with Leo and one next action](docs/leo-today-preview.png) | ![Speaking practice with Leo and a two-minute timer](docs/leo-speak-preview.png) |
+
 ## What you can do
 
-- **Today:** get a concrete exercise, complete Understand → Build → Speak, and reopen unfinished work. Only one step expands at a time.
-- **Roadmap:** explore 24 weeks across six phases, with 144 sessions, weekly deliverables and completion states.
+- **Today:** see one active Understand → Build → Speak action. Reopen another step when needed; Leo responds to the current stage.
+- **Roadmap:** explore 24 weeks across six collapsible phases, with 144 sessions, weekly deliverables and completion states.
 - **Speak:** choose a technical prompt, practice for 2, 3 or 5 minutes, and rate clarity, volume, structure, pace and confidence. The timer uses elapsed wall-clock time, including time spent in another app while the page remains alive. No microphone or recording permission is used.
 - **Progress:** see completed sessions, completed weeks, speaking reflections and a daily streak. Assess each skill independently as Seen → Practiced → Can explain → Can build. Completion does not automatically imply mastery.
 - **Settings:** change your local start date, export a JSON backup, restore a validated backup, and see Home Screen instructions.
@@ -50,6 +56,8 @@ npm run preview
 
 `npm run build` type-checks, bundles the app and generates a service worker with an exact asset precache. `dist/` is the complete static deployment. No environment variables, server, login, external database or API keys are required. React and React DOM are the only runtime dependencies; system fonts and all app icons are local.
 
+Leo is Samuel's existing custom ChatGPT pet, included as a local transparent WebP sprite atlas with six selected animation rows: idle, wave, jump, waiting, focus and review. Each source cell is 192 × 208 pixels. The app uses CSS `steps()` animations and shows a still frame when reduced motion is enabled. Leo reflects progress and does not score or judge it. The asset is bundled with the app and cached for offline use; the pet service is not called at runtime.
+
 ## Deploy to GitHub Pages
 
 1. Merge the implementation branch into `main`.
@@ -90,9 +98,9 @@ npx playwright install --with-deps chromium webkit
 npm run test:e2e                  # Chromium mobile + WebKit iPhone emulation
 ```
 
-Browser tests cover completion and persistence, speaking ratings and history, skill changes, all 24 weeks, rest days, start-date changes, offline reload, backup restoration/export, 320px layouts, timer elapsed time and storage failure. CI installs both browser engines. `CHROMIUM_EXECUTABLE_PATH` optionally selects an existing Chromium binary in constrained environments.
+Browser tests cover completion and persistence, speaking ratings and history, skill changes, all 24 weeks, rest days, start-date changes, offline reload, backup restoration/export, 320px layouts, timer elapsed time, storage failure, Leo’s state changes and reduced motion. CI installs both browser engines. `CHROMIUM_EXECUTABLE_PATH` optionally selects an existing Chromium binary in constrained environments.
 
-Implementation-session verification: production build, all seven model checks and all seven Chromium mobile browser checks passed. Mobile screenshots were reviewed at 320px and 390px. Local WebKit installation was unavailable in the execution environment; the workflow is configured to exercise it in CI. A physical iPhone Home Screen check remains recommended, particularly for Safari storage and installation behavior.
+Implementation-session verification: production build, all seven model checks and eight Chromium mobile browser checks passed. CI runs Chromium and WebKit. Mobile screenshots were reviewed at 320px and 390px. A physical iPhone Home Screen check remains recommended, particularly for Safari storage and installation behavior.
 
 ## Project map
 
@@ -100,9 +108,10 @@ Implementation-session verification: production build, all seven model checks an
 - `src/model.ts`: typed progress, validation, local calendar arithmetic and completion logic.
 - `src/App.tsx`: the four screens and Settings.
 - `src/styles.css`: responsive visual system, touch targets and reduced-motion support.
+- `src/Leo.tsx` and `public/leo-atlas.webp`: Leo's animated states from the existing custom pet sheet.
 - `src/main.tsx`: React entry and service-worker update handling.
 - `scripts/build-sw.mjs`: content-versioned offline precache generation.
 - `public/`: manifest and install icons.
 - `.github/workflows/`: verification and manual Pages deployment.
 
-The design intentionally uses one quiet green accent, warm neutral surfaces, clear rows, a single open task and restrained motion. The mobile review removed a redundant welcome hero so the exercise and primary action appear sooner, condensed the speaking screen, and retained explicit completed/rest/empty states.
+The design uses a quiet green accent, warm neutral surfaces, clear rows, one active task and restrained motion. Leo gives a visual cue for the next practice step. Full briefs and other weeks remain available on demand.
