@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { preview } from 'vite'
 
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-09-28T12:00:00'))
@@ -91,23 +92,43 @@ test('roadmap opens any week, rest day is distinct, and date changes preserve pr
 test('app reloads offline after installation with saved state and packaged icons', async ({
   page,
   context,
+  browserName,
 }) => {
+  // Playwright's WebKit offline emulation currently rejects even a literal
+  // service-worker response. A stopped origin exercises the real cache path.
+  // https://github.com/microsoft/playwright/issues/42775
+  const isolated =
+    browserName === 'webkit'
+      ? await preview({ preview: { host: '127.0.0.1', port: 0 } })
+      : null
+  if (isolated) {
+    const address = isolated.httpServer.address()
+    if (!address || typeof address === 'string')
+      throw new Error('Missing preview port')
+    await page.goto(`http://127.0.0.1:${address.port}/engineer-os/`)
+  }
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready
   })
   await page.reload()
   await page.getByRole('button', { name: 'Understood. Let’s build.' }).click()
-  await context.setOffline(true)
+  if (isolated) {
+    await new Promise<void>((resolve, reject) =>
+      isolated.httpServer.close((error) => (error ? reject(error) : resolve())),
+    )
+  } else {
+    await context.setOffline(true)
+  }
   await page.reload()
   await expect(
     page.getByRole('button', { name: 'Built it. Let’s explain.' }),
   ).toBeVisible()
-  await expect(page.getByText('You’re offline.')).toBeVisible()
+  if (!isolated) await expect(page.getByText('You’re offline.')).toBeVisible()
   await page.getByRole('link', { name: 'Roadmap', exact: true }).click()
   await expect(
     page.getByRole('heading', { name: 'Show what you can do' }),
   ).toBeVisible()
-  await context.setOffline(false)
+  if (!isolated) await context.setOffline(false)
   for (const path of [
     'manifest.webmanifest',
     'apple-touch-icon.png',
@@ -123,13 +144,11 @@ test('backup import validates input, confirms replacement and restores state', a
   page,
 }) => {
   await page.getByRole('button', { name: 'Open settings' }).click()
-  await page
-    .locator('input[type=file]')
-    .setInputFiles({
-      name: 'bad.json',
-      mimeType: 'application/json',
-      buffer: Buffer.from('{"version":2}'),
-    })
+  await page.locator('input[type=file]').setInputFiles({
+    name: 'bad.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from('{"version":2}'),
+  })
   await expect(page.getByRole('alert')).toContainText('not a valid')
   const backup = {
     version: 1,
@@ -145,13 +164,11 @@ test('backup import validates input, confirms replacement and restores state', a
     skills: { 0: 3 },
     speaking: [],
   }
-  await page
-    .locator('input[type=file]')
-    .setInputFiles({
-      name: 'backup.json',
-      mimeType: 'application/json',
-      buffer: Buffer.from(JSON.stringify(backup)),
-    })
+  await page.locator('input[type=file]').setInputFiles({
+    name: 'backup.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(backup)),
+  })
   await expect(
     page.getByText('Replace current progress with this backup?'),
   ).toBeVisible()
