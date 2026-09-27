@@ -14,12 +14,14 @@ test('daily session flows through building, speaking, ratings and persistent com
   await expect(
     page.getByRole('heading', { name: 'Your first small program' }),
   ).toBeVisible()
-  await page.getByRole('button', { name: 'Understood. Let’s build.' }).click()
+  await page.getByRole('button', { name: 'Start learning' }).click()
+  await page.getByRole('button', { name: 'Got it. Let’s build.' }).click()
   await expect(
     page.getByText('Create a console project. Read a company'),
   ).toBeVisible()
+  await page.getByRole('button', { name: 'Start building' }).click()
   await page.getByRole('button', { name: 'Built it. Let’s explain.' }).click()
-  await page.getByRole('button', { name: 'Start speaking practice' }).click()
+  await page.getByRole('button', { name: 'Start speaking' }).click()
   await page
     .getByRole('button', { name: 'Start speaking', exact: true })
     .click()
@@ -59,7 +61,8 @@ test('daily session flows through building, speaking, ratings and persistent com
 test('roadmap opens any week, rest day is distinct, and date changes preserve progress', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Understood. Let’s build.' }).click()
+  await page.getByRole('button', { name: 'Start learning' }).click()
+  await page.getByRole('button', { name: 'Got it. Let’s build.' }).click()
   await page.getByRole('link', { name: 'Roadmap', exact: true }).click()
   await page.getByRole('button', { name: 'Show what you can do' }).click()
   await page
@@ -114,7 +117,8 @@ test('app reloads offline after installation with saved state and packaged icons
     await navigator.serviceWorker.ready
   })
   await page.reload()
-  await page.getByRole('button', { name: 'Understood. Let’s build.' }).click()
+  await page.getByRole('button', { name: 'Start learning' }).click()
+  await page.getByRole('button', { name: 'Got it. Let’s build.' }).click()
   if (isolated) {
     await new Promise<void>((resolve, reject) =>
       isolated.httpServer.close((error) => (error ? reject(error) : resolve())),
@@ -124,12 +128,12 @@ test('app reloads offline after installation with saved state and packaged icons
   }
   await page.reload()
   await expect(
-    page.getByRole('button', { name: 'Built it. Let’s explain.' }),
+    page.getByRole('button', { name: 'Start building' }),
   ).toBeVisible()
   if (!isolated) await expect(page.getByText('You’re offline.')).toBeVisible()
   await page.getByRole('link', { name: 'Roadmap', exact: true }).click()
   await expect(
-    page.getByRole('heading', { name: 'Your path, at a glance.' }),
+    page.getByRole('heading', { name: 'Your roadmap.' }),
   ).toBeVisible()
   if (!isolated) await context.setOffline(false)
   for (const path of [
@@ -231,21 +235,24 @@ test('failed persistence is visible and does not prevent continued practice', as
       throw new DOMException('Quota exceeded', 'QuotaExceededError')
     }
   })
-  await page.getByRole('button', { name: 'Understood. Let’s build.' }).click()
+  await page.getByRole('button', { name: 'Start learning' }).click()
+  await page.getByRole('button', { name: 'Got it. Let’s build.' }).click()
   await expect(page.getByRole('alert')).toContainText('could not be saved')
   await expect(
-    page.getByRole('button', { name: 'Built it. Let’s explain.' }),
+    page.getByRole('button', { name: 'Start building' }),
   ).toBeVisible()
 })
 
 test('Leo changes animation with the task and respects reduced motion', async ({
   page,
 }) => {
-  const leo = page.locator('.today-hero .leo-sprite')
+  const leo = page.locator('.premium-leo-wrap .leo-sprite')
   await expect(leo).toHaveClass(/leo-wave/)
   await expect(leo).toHaveCSS('animation-name', 'leo-motion')
-  await page.getByRole('button', { name: 'Understood. Let’s build.' }).click()
+  await page.getByRole('button', { name: 'Start learning' }).click()
+  await page.getByRole('button', { name: 'Got it. Let’s build.' }).click()
   await expect(leo).toHaveClass(/leo-focus/)
+  await page.getByRole('button', { name: 'Start building' }).click()
   await page.getByRole('button', { name: 'Built it. Let’s explain.' }).click()
   await expect(leo).toHaveClass(/leo-waiting/)
   await page.emulateMedia({ reducedMotion: 'reduce' })

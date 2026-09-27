@@ -136,12 +136,10 @@ export default function App() {
           }}
           aria-label="Engineer OS home"
         >
-          <span className="brand-symbol">
-            <span />
-            <span />
+          <span className="brand-leaf" aria-hidden="true">
             <span />
           </span>
-          engineer<span className="brand-os">OS</span>
+          <span className="brand-name">Engineer OS</span>
         </a>
         <button
           className="icon-button"
@@ -299,80 +297,91 @@ function Today({
   const done = isComplete(progress)
   const next = steps.find((step) => !progress[step]) ?? null
   const [chosen, setChosen] = useState<Step | null>(next)
-  useEffect(
-    () =>
-      setChosen(
-        steps.find((step) => !state.sessions[sessionId(week, day)]?.[step]) ??
-          null,
-      ),
-    [week, day, state.sessions],
-  )
+  const [engaged, setEngaged] = useState<Step | null>(null)
+
+  useEffect(() => {
+    const nextStep =
+      steps.find((step) => !state.sessions[sessionId(week, day)]?.[step]) ?? null
+    setChosen(nextStep)
+    setEngaged(null)
+  }, [week, day, state.sessions])
+
   const active = chosen ?? next
   const date = addDays(state.startDate, week * 7 + day)
   const weekDone = Array.from({ length: 6 }, (_, d) =>
     isComplete(state.sessions[sessionId(week, d)]),
   ).filter(Boolean).length
   const completedSteps = steps.filter((step) => progress[step]).length
-  const names = {
-    learn: 'Understand',
-    build: 'Build it yourself',
-    speak: 'Say it out loud',
+
+  const stage = {
+    learn: {
+      label: 'Understand',
+      hero: 'Let’s learn.',
+      sub: 'Get the concept clear before you build.',
+      bubble: 'Start here.',
+      title: 'Get it clear.',
+      icon: 'book',
+      minutes: data.learnMinutes,
+      copy: data.learn,
+      start: 'Start learning',
+      finish: 'Got it. Let’s build.',
+      mood: 'wave' as const,
+    },
+    build: {
+      label: 'Build',
+      hero: 'Let’s build.',
+      sub: 'Hands-on practice makes the concept real.',
+      bubble: 'Build mode.',
+      title: 'Apply it yourself.',
+      icon: 'code',
+      minutes: data.buildMinutes,
+      copy: data.build,
+      start: 'Start building',
+      finish: 'Built it. Let’s explain.',
+      mood: 'focus' as const,
+    },
+    speak: {
+      label: 'Explain',
+      hero: 'Let’s explain.',
+      sub: 'Say it clearly to make it stick.',
+      bubble: 'You’ve got this.',
+      title: 'Say it clearly.',
+      icon: 'speak',
+      minutes: 5,
+      copy: communication[week][1],
+      start: 'Start speaking',
+      finish: 'Start speaking',
+      mood: 'waiting' as const,
+    },
   }
-  const minutes = {
-    learn: data.learnMinutes,
-    build: data.buildMinutes,
-    speak: 5,
+
+  const currentStage = active ? stage[active] : null
+
+  function complete(step: Step) {
+    update((s) => setStep(s, id, step, true))
+    setEngaged(null)
   }
-  const copy = {
-    learn: data.learn,
-    build: data.build,
-    speak: communication[week][1],
-  }
-  const mood =
-    day === 6
-      ? 'idle'
-      : done
-        ? 'jump'
-        : active === 'build'
-          ? 'focus'
-          : active === 'speak'
-            ? 'waiting'
-            : 'wave'
-  function toggle(step: Step) {
-    update((s) => setStep(s, id, step, !progress[step]))
+
+  function selectStep(step: Step) {
+    if (step === active || progress[step]) {
+      setChosen(step)
+      setEngaged(null)
+    }
   }
 
   return (
-    <div className="screen today-screen">
-      <div className="eyebrow page-date">
-        {dateLabel(date, { weekday: 'long', day: 'numeric', month: 'long' })}
+    <div className="screen today-screen premium-today">
+      <div className="today-context">
+        <span>
+          {dateLabel(date, { weekday: 'long' })} · Week {String(week + 1).padStart(2, '0')}
+        </span>
         {selected && (
           <button className="text-button" onClick={onToday}>
             Back to today
           </button>
         )}
       </div>
-      <section className="today-hero">
-        <div className="today-hero-copy">
-          <div className="eyebrow accent">
-            Week {String(week + 1).padStart(2, '0')} / 24 ·{' '}
-            {phases[Math.floor(week / 4)].subject}
-          </div>
-          <h1>
-            {day === 6
-              ? 'Time to recharge.'
-              : done
-                ? 'You did it.'
-                : data.title}
-          </h1>
-          <p>
-            {day === 6
-              ? 'No session today.'
-              : `${data.minutes} min · Session ${day + 1} of 6`}
-          </p>
-        </div>
-        <Leo mood={mood} size={116} />
-      </section>
+
       {!selected && current.before && (
         <div className="quiet-notice">
           Starts {dateLabel(state.startDate)}. You can begin early.
@@ -383,143 +392,176 @@ function Today({
           Your 24 weeks are complete. Revisit sessions in Roadmap.
         </div>
       )}
-      <div
-        className="today-track"
-        role="progressbar"
-        aria-label="Session steps completed"
-        aria-valuemin={0}
-        aria-valuemax={3}
-        aria-valuenow={day === 6 ? 0 : completedSteps}
-      >
-        {steps.map((step) => (
-          <span key={step} className={progress[step] ? 'filled' : ''} />
-        ))}
-      </div>
+
       {day === 6 ? (
-        <div className="today-rest">
-          <h2>Let it settle.</h2>
-          <p>
-            Rest today. If you feel like it, explain one thing you learned this
-            week to someone.
-          </p>
-          <button className="primary" onClick={onRoadmap}>
-            Explore your roadmap <Icon name="arrow" size={18} />
-          </button>
-        </div>
-      ) : (
-        <>
-          {done && !active && (
-            <div className="today-finished" role="status">
-              <h2>Session complete</h2>
-              <p>One more thing you can understand, build and explain.</p>
-              <button
-                className="primary"
-                onClick={() =>
-                  day < 5 ? openSession(week, day + 1) : openSession(week, 6)
-                }
-              >
-                See the next day <Icon name="arrow" size={18} />
-              </button>
+        <section className="premium-state premium-rest">
+          <div className="premium-state-copy">
+            <span className="premium-kicker">Rest day</span>
+            <h1>Let it settle.</h1>
+            <p>Recovery is part of getting better. One thought aloud is enough today.</p>
+          </div>
+          <div className="premium-leo-wrap">
+            <span className="leo-bubble">Recharge.</span>
+            <Leo mood="idle" size={100} />
+          </div>
+          <div className="premium-task-card">
+            <div className="premium-card-top">
+              <span className="premium-card-icon"><Icon name="book" size={24} /></span>
+              <span className="premium-pill">Reflect</span>
+              <span className="premium-time"><Icon name="clock" size={17} /> 5 min</span>
             </div>
-          )}
-          {active && (
+            <h2>Keep one idea.</h2>
+            <p>Explain one useful thing you learned this week to yourself or someone else.</p>
+            <button className="primary" onClick={onRoadmap}>
+              Open roadmap <Icon name="arrow" size={18} />
+            </button>
+          </div>
+        </section>
+      ) : done && !active ? (
+        <section className="premium-state premium-complete" role="status">
+          <h2 className="sr-only">Session complete</h2>
+          <div className="premium-state-copy">
+            <span className="premium-kicker">Session complete</span>
+            <h1>That one’s yours.</h1>
+            <p>You understood it, built it and explained it.</p>
+          </div>
+          <div className="premium-leo-wrap">
+            <span className="leo-bubble">Nice work.</span>
+            <Leo mood="jump" size={104} />
+          </div>
+          <div className="premium-task-card premium-complete-card">
+            <span className="premium-complete-mark"><Icon name="check" size={28} /></span>
+            <h2>{data.title}</h2>
+            <p>One more capability you can use without leaning on a checklist.</p>
+            <button
+              className="primary"
+              onClick={() =>
+                day < 5 ? openSession(week, day + 1) : openSession(week, 6)
+              }
+            >
+              See the next day <Icon name="arrow" size={18} />
+            </button>
+          </div>
+        </section>
+      ) : currentStage && active ? (
+        <>
+          <h2 className="sr-only">{data.title}</h2>
+          <section className="premium-state">
+            <div className="premium-state-copy">
+              <span className="premium-kicker">
+                {phases[Math.floor(week / 4)].subject}
+              </span>
+              <h1>{currentStage.hero}</h1>
+              <p>{currentStage.sub}</p>
+            </div>
+
+            <div className="premium-leo-wrap">
+              <span className="leo-bubble">{currentStage.bubble}</span>
+              <Leo mood={currentStage.mood} size={102} />
+            </div>
+
             <section
-              className="today-focus"
+              className="premium-task-card"
               aria-labelledby="today-focus-heading"
             >
-              <div className="focus-kicker">
-                <span className="eyebrow">
-                  {progress[active] ? 'Completed step' : 'Next up'}
+              <div className="premium-card-top">
+                <span className="premium-card-icon">
+                  <Icon name={currentStage.icon} size={25} />
                 </span>
-                <span>{minutes[active]} min</span>
+                <span className="premium-pill">{currentStage.label}</span>
+                <span className="premium-time">
+                  <Icon name="clock" size={17} /> {currentStage.minutes} min
+                </span>
               </div>
-              <h2 id="today-focus-heading">{names[active]}</h2>
-              <p className="focus-instruction">{copy[active]}</p>
-              {active === 'learn' && (
+
+              <h2 id="today-focus-heading">{currentStage.title}</h2>
+              <p className="premium-task-copy">{currentStage.copy}</p>
+
+              {engaged === active && active === 'learn' && (
                 <a
-                  className="resource-link"
+                  className="premium-inline-action"
                   href={resourceFor(week).url}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open reference <Icon name="external" size={14} />
+                  Open reference <Icon name="external" size={15} />
                 </a>
               )}
-              {active === 'build' && (
-                <details className="focus-detail">
+
+              {engaged === active && active === 'build' && (
+                <details className="premium-detail">
                   <summary>
-                    What counts as done <Icon name="down" size={16} />
+                    Definition of done <Icon name="down" size={15} />
                   </summary>
                   <p>{data.check}</p>
-                  <ol>
-                    <li>Attempt it yourself first.</li>
-                    <li>Ask AI for a hint if stuck.</li>
-                    <li>Implement, request a review, then explain it aloud.</li>
-                  </ol>
                 </details>
               )}
+
               {active === 'speak' && (
-                <p className="framework-inline">
-                  Statement → Reason → Example → Consequence
-                </p>
+                <div className="premium-mic" aria-hidden="true">
+                  <span />
+                  <Icon name="speak" size={31} />
+                  <span />
+                </div>
               )}
-              {active === 'speak' && !progress.speak ? (
-                <button className="primary" onClick={onSpeak}>
-                  Start speaking practice <Icon name="arrow" size={18} />
+
+              {active === 'speak' ? (
+                <button className="primary premium-cta" onClick={onSpeak}>
+                  {currentStage.start} <Icon name="arrow" size={20} />
+                </button>
+              ) : engaged === active ? (
+                <button
+                  className="primary premium-cta"
+                  onClick={() => complete(active)}
+                >
+                  {currentStage.finish} <Icon name="arrow" size={20} />
                 </button>
               ) : (
                 <button
-                  className={progress[active] ? 'secondary full' : 'primary'}
-                  onClick={() => toggle(active)}
+                  className="primary premium-cta"
+                  onClick={() => setEngaged(active)}
                 >
-                  {progress[active]
-                    ? 'Mark as unfinished'
-                    : active === 'learn'
-                      ? 'Understood. Let’s build.'
-                      : 'Built it. Let’s explain.'}
-                  {!progress[active] && <Icon name="arrow" size={18} />}
+                  {currentStage.start} <Icon name="arrow" size={20} />
                 </button>
               )}
             </section>
-          )}
-          <div className="today-steps" aria-label="Session steps">
-            {steps
-              .filter((step) => step !== active)
-              .map((step) => (
+          </section>
+
+          <div
+            className="premium-stepper"
+            role="progressbar"
+            aria-label="Session steps completed"
+            aria-valuemin={0}
+            aria-valuemax={3}
+            aria-valuenow={completedSteps}
+          >
+            {steps.map((step, index) => {
+              const completeStep = progress[step]
+              const activeStep = step === active
+              return (
                 <button
                   key={step}
-                  onClick={() => setChosen(step)}
-                  className="today-step-row"
+                  className={`premium-step ${completeStep ? 'is-done' : ''} ${activeStep ? 'is-active' : ''}`}
+                  onClick={() => selectStep(step)}
+                  disabled={!completeStep && !activeStep}
                 >
-                  <span
-                    className={`task-number ${progress[step] ? 'checked' : ''}`}
-                  >
-                    {progress[step] ? (
-                      <Icon name="check" size={16} />
-                    ) : (
-                      steps.indexOf(step) + 1
-                    )}
+                  <span className="premium-step-dot">
+                    {completeStep ? <Icon name="check" size={16} /> : index + 1}
                   </span>
-                  <span>
-                    {names[step]}
-                    <small>
-                      {progress[step] ? 'Done' : `${minutes[step]} min`}
-                    </small>
-                  </span>
-                  <Icon name="chevron" size={17} />
+                  <span>{stage[step].label}</span>
                 </button>
-              ))}
+              )
+            })}
+          </div>
+
+          <div className="today-week-meta">
+            <span>{weekDone}/6 sessions this week</span>
+            <button className="text-button" onClick={onRoadmap}>
+              Roadmap <Icon name="arrow" size={15} />
+            </button>
           </div>
         </>
-      )}
-      <div className="today-bottom">
-        <span>
-          Week {week + 1} · {weekDone} of 6 sessions
-        </span>
-        <button className="text-button" onClick={onRoadmap}>
-          Roadmap <Icon name="arrow" size={15} />
-        </button>
-      </div>
+      ) : null}
     </div>
   )
 }
@@ -541,10 +583,15 @@ function Roadmap({
 
   return (
     <div className="screen roadmap-screen">
-      <header className="roadmap-hero">
-        <div>
+      <header className="roadmap-hero premium-page-hero">
+        <div className="premium-page-copy">
           <div className="eyebrow">24-week path</div>
-          <h1>Your path, at a glance.</h1>
+          <h1>Your roadmap.</h1>
+          <p>Six phases. One capability at a time.</p>
+        </div>
+        <div className="premium-page-mascot">
+          <span className="leo-bubble">Keep going.</span>
+          <Leo mood="wave" size={78} />
         </div>
         <div className="roadmap-week-badge" aria-label={`Current week ${safeCurrentWeek + 1} of 24`}>
           <strong>{String(safeCurrentWeek + 1).padStart(2, '0')}</strong>
@@ -809,10 +856,15 @@ function Speak({
     <div
       className={`screen speak-screen${started ? ' is-started' : ''}${finished ? ' is-finished' : ''}${saved ? ' is-saved' : ''}`}
     >
-      <header className="speak-header">
-        <div>
-          <div className="eyebrow">Communication practice · Week {week + 1}</div>
+      <header className="speak-header premium-page-hero">
+        <div className="premium-page-copy">
+          <div className="eyebrow">Communication · Week {week + 1}</div>
           <h1>Say it clearly.</h1>
+          <p>Structure the thought. Then give it your voice.</p>
+        </div>
+        <div className="premium-page-mascot">
+          <span className="leo-bubble">I’m listening.</span>
+          <Leo mood={deadline ? 'focus' : 'waiting'} size={78} />
         </div>
       </header>
 
@@ -1083,9 +1135,16 @@ function Progress({
 
   return (
     <div className="screen progress-screen">
-      <header className="progress-header">
-        <div className="eyebrow">Progress</div>
-        <h1>See what’s getting stronger.</h1>
+      <header className="progress-header premium-page-hero">
+        <div className="premium-page-copy">
+          <div className="eyebrow">Progress</div>
+          <h1>See what’s getting stronger.</h1>
+          <p>Track evidence, not activity for activity’s sake.</p>
+        </div>
+        <div className="premium-page-mascot">
+          <span className="leo-bubble">Look at that.</span>
+          <Leo mood={complete > 0 ? 'jump' : 'wave'} size={78} />
+        </div>
       </header>
 
       <section className="progress-hero" aria-label="Program progress">
