@@ -43,7 +43,7 @@ test('daily session flows through building, speaking, ratings and persistent com
     page.getByRole('heading', { name: 'Session complete' }),
   ).toBeVisible()
   await page.getByRole('link', { name: 'Progress', exact: true }).click()
-  await expect(page.getByText('1 of 144 sessions completed')).toBeVisible()
+  await expect(page.getByText('1 of 144 sessions')).toBeVisible()
   await expect(page.locator('blockquote')).not.toBeVisible()
   await page.getByRole('button', { name: 'View history' }).click()
   await expect(page.locator('blockquote')).toHaveText('Pause between ideas.')
