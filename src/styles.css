@@ -1528,3 +1528,251 @@ blockquote {
 .quiet-notice {
   margin-top: 16px;
 }
+
+/* Leo: approved frames from the user's existing custom pet, scaled without blur. */
+.leo-sprite {
+  display: block;
+  flex: none;
+  background-repeat: no-repeat;
+  background-position-x: 0;
+  image-rendering: pixelated;
+  animation: leo-motion var(--leo-duration) var(--leo-frames) infinite;
+}
+.leo-jump {
+  animation-iteration-count: 2;
+  animation-fill-mode: forwards;
+}
+@keyframes leo-motion {
+  to {
+    background-position-x: var(--leo-travel);
+  }
+}
+.today-screen {
+  padding-top: 14px;
+}
+.today-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  min-height: 154px;
+  margin-top: 12px;
+}
+.today-hero-copy {
+  min-width: 0;
+  flex: 1;
+}
+.today-hero h1 {
+  font-size: 27px;
+  line-height: 1.18;
+  margin-top: 9px;
+  letter-spacing: -0.95px;
+}
+.today-hero p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.today-hero .leo-sprite {
+  margin-right: -5px;
+}
+.today-track {
+  display: flex;
+  gap: 5px;
+  margin: 14px 0 25px;
+}
+.today-track span {
+  height: 4px;
+  flex: 1;
+  background: #dce0d4;
+  border-radius: 4px;
+}
+.today-track span.filled {
+  background: var(--green);
+}
+.today-focus {
+  background: #ebeee5;
+  padding: 21px;
+  border-radius: 14px;
+}
+.focus-kicker {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  color: #58674e;
+}
+.focus-kicker .eyebrow {
+  color: #536843;
+}
+.today-focus h2 {
+  font-size: 22px;
+  margin-top: 11px;
+}
+.today-focus .focus-instruction {
+  font-size: 14px;
+  line-height: 1.58;
+  margin-top: 12px;
+  color: #414c40;
+}
+.today-focus .resource-link {
+  margin: 5px 0 2px;
+}
+.today-focus .primary,
+.today-focus .secondary {
+  margin-top: 19px;
+}
+.today-focus .framework-inline {
+  font-size: 11px !important;
+  margin-top: 12px;
+}
+.focus-detail {
+  font-size: 12px;
+  color: #53614e;
+  margin-top: 9px;
+}
+.focus-detail summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+.focus-detail p {
+  margin: 8px 0;
+}
+.focus-detail ol {
+  padding-left: 18px;
+  line-height: 1.7;
+}
+.today-steps {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.today-step-row {
+  display: flex;
+  width: 100%;
+  gap: 13px;
+  min-height: 68px;
+  text-align: left;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+.today-step-row > span:nth-child(2) {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 550;
+}
+.today-step-row small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+.today-step-row > svg {
+  color: var(--muted);
+}
+.today-finished,
+.today-rest {
+  padding: 8px 0 14px;
+}
+.today-finished h2,
+.today-rest h2 {
+  font-size: 22px;
+}
+.today-finished p,
+.today-rest p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 9px;
+}
+.today-finished .primary,
+.today-rest .primary {
+  margin-top: 21px;
+}
+.today-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.today-bottom .text-button {
+  font-size: 12px;
+}
+.phase-heading {
+  width: 100%;
+  text-align: left;
+  min-height: 65px;
+  padding: 0;
+}
+.phase-heading > div {
+  flex: 1;
+}
+.phase-heading > svg {
+  color: var(--muted);
+  transition: transform 0.18s;
+}
+.phase-heading[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
+.phase {
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+}
+.phase:first-of-type {
+  margin-top: 21px;
+  border-top: 1px solid var(--line);
+}
+.phase .weeks {
+  margin-left: 45px;
+}
+.timer-panel {
+  position: relative;
+  overflow: hidden;
+}
+.timer-pet {
+  position: absolute;
+  right: 14px;
+  top: 4px;
+  width: 70px;
+  height: 77px;
+  pointer-events: none;
+}
+.timer-top {
+  min-height: 39px;
+  padding-right: 69px;
+}
+.timer {
+  margin-top: 3px;
+}
+@media (max-width: 370px) {
+  .today-hero {
+    min-height: 138px;
+  }
+  .today-hero h1 {
+    font-size: 24px;
+  }
+  .today-hero .leo-sprite {
+    transform: scale(0.86);
+    transform-origin: right center;
+    margin-left: -18px;
+  }
+  .today-focus {
+    padding: 18px;
+  }
+  .phase .weeks {
+    margin-left: 34px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .leo-sprite {
+    animation: none !important;
+    background-position-x: 0 !important;
+  }
+}
