@@ -1,18 +1,24 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #252b27;
-  background: #f6f5f0;
+  color: #222a25;
+  background: #f7f6f1;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   font-weight: 400;
-  --paper: #f6f5f0;
-  --ink: #252b27;
-  --muted: #6b7069;
-  --green: #304d3d;
-  --line: #dedfd5;
-  --light: #e9eddf;
-  --accent: #657c47;
+  --paper: #f7f6f1;
+  --ink: #222a25;
+  --muted: #687069;
+  --green: #27483a;
+  --line: #dce0d7;
+  --light: #eef1e8;
+  --accent: #607a4a;
+  --surface: #eef1e8;
+  --surface-strong: #e5eadc;
+  --focus: #829652;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
 * {
   box-sizing: border-box;
@@ -62,7 +68,7 @@ summary:focus-visible,
 select:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid #829652;
+  outline: 3px solid var(--focus);
   outline-offset: 4px;
 }
 button:active:not(:disabled) {
@@ -79,8 +85,8 @@ p {
 }
 h1 {
   font-size: 32px;
-  font-weight: 620;
-  letter-spacing: -1.25px;
+  font-weight: 650;
+  letter-spacing: -1.15px;
   line-height: 1.15;
   margin-top: 12px;
 }
@@ -110,7 +116,7 @@ p {
 }
 .app-header {
   height: calc(84px + env(safe-area-inset-top));
-  padding: calc(14px + env(safe-area-inset-top)) 26px 14px;
+  padding: calc(14px + env(safe-area-inset-top)) 22px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -168,14 +174,14 @@ main {
   outline: none !important;
 }
 .screen {
-  padding: 22px 26px calc(118px + env(safe-area-inset-bottom));
+  padding: 22px 22px calc(118px + env(safe-area-inset-bottom));
   animation: appear 0.22s ease;
 }
 .eyebrow {
   text-transform: uppercase;
   font-size: 10px;
   font-weight: 650;
-  letter-spacing: 1.65px;
+  letter-spacing: 1.2px;
   line-height: 1.6;
   color: var(--muted);
 }
@@ -405,11 +411,11 @@ main {
   gap: 14px;
   background: var(--green);
   color: #fff;
-  padding: 15px 18px;
-  min-height: 52px;
-  border-radius: 11px;
-  font-size: 13px;
-  font-weight: 550;
+  padding: 13px 16px;
+  min-height: 48px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 620;
   line-height: 1.4;
   width: 100%;
   transition:
@@ -424,10 +430,10 @@ main {
   margin-top: 18px;
 }
 .secondary {
-  min-height: 48px;
-  padding: 12px 17px;
+  min-height: 46px;
+  padding: 11px 16px;
   border: 1px solid #c7cbbf;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: transparent;
   font-size: 13px;
 }
@@ -540,7 +546,7 @@ main {
   grid-template-columns: repeat(4, 1fr);
   padding: 9px 14px calc(9px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
-  background: #f6f5f0;
+  background: var(--paper);
 }
 .bottom-nav a {
   display: flex;
@@ -567,7 +573,7 @@ main {
   font-weight: 650;
 }
 .bottom-nav a[aria-current='page'] .nav-icon {
-  background: #e4e9d9;
+  background: var(--surface-strong);
 }
 .roadmap-summary {
   display: flex;
@@ -1263,7 +1269,7 @@ blockquote {
   background: #1e292780;
 }
 .settings-content {
-  padding: 23px 26px calc(30px + env(safe-area-inset-bottom));
+  padding: 23px 22px calc(30px + env(safe-area-inset-bottom));
 }
 .dialog-header {
   display: flex;
@@ -1343,7 +1349,7 @@ blockquote {
 .update-note,
 .connection-note {
   font-size: 12px;
-  margin: 0 26px;
+  margin: 0 22px;
   padding: 13px 16px;
   border-radius: 8px;
   background: #ede9d8;
