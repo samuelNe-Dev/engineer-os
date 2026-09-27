@@ -41,8 +41,8 @@
 .roadmap-overview {
   margin: 24px 0 18px;
   padding: 17px 18px 15px;
-  border-radius: 14px;
-  background: #ebeee5;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
 
 .roadmap-overview-top {
@@ -74,7 +74,7 @@
   height: 4px;
   overflow: hidden;
   border-radius: 999px;
-  background: #d8decf;
+  background: var(--surface-strong);
   margin-top: 14px;
 }
 
