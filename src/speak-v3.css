@@ -23,8 +23,8 @@
   gap: 8px;
   margin: 12px 0 13px;
   padding: 8px 11px;
-  border-radius: 10px;
-  background: #ebeee5;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   color: #53614e;
   font-size: 11px;
   line-height: 1.35;
@@ -109,7 +109,7 @@
 
 .speak-screen .timer-panel {
   padding: 18px 20px 17px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 .speak-screen .timer-pet {
