@@ -533,137 +533,173 @@ function Roadmap({
   currentWeek: number
   openSession: (w: number, d: number) => void
 }) {
-  const [open, setOpen] = useState<number | null>(currentWeek)
-  const [openPhase, setOpenPhase] = useState<number | null>(
-    Math.floor(currentWeek / 4),
-  )
+  const safeCurrentWeek = Math.min(Math.max(currentWeek, 0), 23)
+  const currentPhase = Math.floor(safeCurrentWeek / 4)
+  const [open, setOpen] = useState<number | null>(safeCurrentWeek)
+  const [openPhase, setOpenPhase] = useState<number | null>(currentPhase)
+  const totalComplete = Object.values(state.sessions).filter(isComplete).length
+
   return (
-    <div className="screen">
-      <div className="eyebrow">Your next 24 weeks</div>
-      <h1>Depth, built daily.</h1>
-      <p className="page-intro">Six phases. One project that grows with you.</p>
-      <div className="roadmap-summary">
-        <span>
-          6h 15m <span className="muted">/ week</span>
-        </span>
-        <span className="muted">Speaking, every week</span>
+    <div className="screen roadmap-screen">
+      <header className="roadmap-hero">
+        <div>
+          <div className="eyebrow">24-week path</div>
+          <h1>Your path, at a glance.</h1>
+        </div>
+        <div className="roadmap-week-badge" aria-label={`Current week ${safeCurrentWeek + 1} of 24`}>
+          <strong>{String(safeCurrentWeek + 1).padStart(2, '0')}</strong>
+          <span>/24</span>
+        </div>
+      </header>
+
+      <section className="roadmap-overview" aria-label="Program progress">
+        <div className="roadmap-overview-top">
+          <div>
+            <span className="eyebrow">Current phase</span>
+            <strong>{phases[currentPhase].name}</strong>
+          </div>
+          <span>{totalComplete}/144 sessions</span>
+        </div>
+        <div
+          className="roadmap-overview-track"
+          role="progressbar"
+          aria-label="Program completion"
+          aria-valuemin={0}
+          aria-valuemax={144}
+          aria-valuenow={totalComplete}
+        >
+          <span style={{ width: `${Math.round((totalComplete / 144) * 100)}%` }} />
+        </div>
+      </section>
+
+      <div className="roadmap-phase-list">
+        {phases.map((phase, pi) => {
+          const phaseStart = pi * 4
+          const phaseWeeks = weeks.slice(phaseStart, phaseStart + 4)
+          const phaseDone = Array.from({ length: 24 }, (_, i) => {
+            const week = phaseStart + Math.floor(i / 6)
+            const day = i % 6
+            return isComplete(state.sessions[sessionId(week, day)])
+          }).filter(Boolean).length
+          const isCurrent = pi === currentPhase
+          const phaseState =
+            phaseDone === 24 ? 'Complete' : isCurrent ? 'Current' : pi < currentPhase ? 'Revisit' : 'Upcoming'
+
+          return (
+            <section
+              className={`roadmap-phase ${isCurrent ? 'is-current' : ''}`}
+              key={phase.name}
+            >
+              <button
+                className="roadmap-phase-toggle"
+                aria-expanded={openPhase === pi}
+                aria-controls={`phase-${pi}`}
+                onClick={() => setOpenPhase(openPhase === pi ? null : pi)}
+              >
+                <span className="roadmap-phase-index">0{pi + 1}</span>
+                <span className="roadmap-phase-copy">
+                  <span className="roadmap-phase-meta">
+                    Weeks {phase.range} · {phaseState}
+                  </span>
+                  <strong>{phase.name}</strong>
+                </span>
+                <span className="roadmap-phase-count">{phaseDone}/24</span>
+                <Icon name="down" size={17} />
+              </button>
+
+              {openPhase === pi && (
+                <div className="roadmap-weeks" id={`phase-${pi}`}>
+                  {phaseWeeks.map((w, index) => {
+                    const wi = phaseStart + index
+                    const count = Array.from({ length: 6 }, (_, d) =>
+                      isComplete(state.sessions[sessionId(wi, d)]),
+                    ).filter(Boolean).length
+                    const weekState =
+                      count === 6
+                        ? 'Complete'
+                        : wi === safeCurrentWeek
+                          ? 'This week'
+                          : count
+                            ? `${count}/6 done`
+                            : wi < safeCurrentWeek
+                              ? 'Ready to revisit'
+                              : 'Upcoming'
+
+                    return (
+                      <div
+                        className={`roadmap-week ${wi === safeCurrentWeek ? 'is-current' : ''}`}
+                        key={wi}
+                      >
+                        <button
+                          className="roadmap-week-toggle"
+                          aria-expanded={open === wi}
+                          aria-controls={`week-${wi}`}
+                          onClick={() => setOpen(open === wi ? null : wi)}
+                        >
+                          <span className={`roadmap-week-number ${count === 6 ? 'is-complete' : ''}`}>
+                            {count === 6 ? <Icon name="check" size={15} /> : wi + 1}
+                          </span>
+                          <span className="roadmap-week-copy">
+                            <strong>{w.title}</strong>
+                            <small>{weekState}</small>
+                          </span>
+                          <Icon name="chevron" size={16} />
+                        </button>
+
+                        {open === wi && (
+                          <div className="roadmap-week-detail" id={`week-${wi}`}>
+                            <div className="roadmap-week-brief">
+                              <span className="eyebrow">Outcome</span>
+                              <p>{w.outcome}</p>
+                            </div>
+
+                            <div className="roadmap-week-brief">
+                              <span className="eyebrow">Weekly build · 150 min</span>
+                              <p>{w.ship}</p>
+                            </div>
+
+                            <div className="roadmap-session-list" aria-label={`Week ${wi + 1} sessions`}>
+                              {Array.from({ length: 6 }, (_, d) => {
+                                const complete = isComplete(
+                                  state.sessions[sessionId(wi, d)],
+                                )
+                                return (
+                                  <button key={d} onClick={() => openSession(wi, d)}>
+                                    <span className={`roadmap-session-dot ${complete ? 'is-complete' : ''}`}>
+                                      {complete ? <Icon name="check" size={13} /> : d + 1}
+                                    </span>
+                                    <span>{session(wi, d).title}</span>
+                                    <Icon name="chevron" size={15} />
+                                  </button>
+                                )
+                              })}
+                            </div>
+
+                            <div className="roadmap-speaking-focus">
+                              <Icon name="speak" size={16} />
+                              <span>{communication[wi][0]}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          )
+        })}
       </div>
-      <details className="rhythm">
+
+      <details className="roadmap-rhythm">
         <summary>
-          The weekly rhythm <Icon name="down" size={16} />
+          How the week works <Icon name="down" size={16} />
         </summary>
         <p>
-          Five 45-minute sessions, one 150-minute build and one rest day. The
-          dates follow your program start. Every session includes five minutes
-          for speaking and reflection.
-        </p>
-        <p>
-          Missed a day? Continue at your pace. Open any week to revisit a
-          session. No catch-up marathon required.
+          Five focused sessions, one longer build and one rest day. Speaking
+          practice runs through the whole program.
         </p>
       </details>
-      {phases.map((phase, pi) => (
-        <section className="phase" key={phase.name}>
-          <button
-            className="phase-heading"
-            aria-expanded={openPhase === pi}
-            aria-controls={`phase-${pi}`}
-            onClick={() => setOpenPhase(openPhase === pi ? null : pi)}
-          >
-            <span className="phase-number">0{pi + 1}</span>
-            <div>
-              <span className="eyebrow">Weeks {phase.range}</span>
-              <h2>{phase.name}</h2>
-            </div>
-            <Icon name="down" size={18} />
-          </button>
-          {openPhase === pi && (
-            <div className="weeks" id={`phase-${pi}`}>
-              {weeks.slice(pi * 4, pi * 4 + 4).map((w, index) => {
-                const wi = pi * 4 + index
-                const count = Array.from({ length: 6 }, (_, d) =>
-                  isComplete(state.sessions[sessionId(wi, d)]),
-                ).filter(Boolean).length
-                return (
-                  <div
-                    className={`week-row ${wi === currentWeek ? 'current-week' : ''}`}
-                    key={wi}
-                  >
-                    <button
-                      className="week-toggle"
-                      aria-expanded={open === wi}
-                      aria-controls={`week-${wi}`}
-                      onClick={() => setOpen(open === wi ? null : wi)}
-                    >
-                      <span className="week-index">
-                        {count === 6 ? (
-                          <Icon name="check" size={17} />
-                        ) : (
-                          String(wi + 1).padStart(2, '0')
-                        )}
-                      </span>
-                      <span className="week-title">
-                        {w.title}
-                        <span>
-                          {count === 6
-                            ? 'Complete'
-                            : wi === currentWeek
-                              ? 'Current week'
-                              : count
-                                ? `${count}/6 completed`
-                                : wi < currentWeek
-                                  ? 'Ready to revisit'
-                                  : 'Upcoming'}
-                        </span>
-                      </span>
-                      <Icon name="down" size={17} />
-                    </button>
-                    {open === wi && (
-                      <div className="week-detail" id={`week-${wi}`}>
-                        <p>{w.outcome}</p>
-                        <div className="week-project">
-                          <span className="eyebrow">
-                            Weekly build · 150 min
-                          </span>
-                          <p>{w.ship}</p>
-                        </div>
-                        <div className="roadmap-sessions">
-                          {Array.from({ length: 6 }, (_, d) => (
-                            <button key={d} onClick={() => openSession(wi, d)}>
-                              <span
-                                className={
-                                  isComplete(state.sessions[sessionId(wi, d)])
-                                    ? 'session-bullet complete'
-                                    : 'session-bullet'
-                                }
-                              >
-                                {isComplete(
-                                  state.sessions[sessionId(wi, d)],
-                                ) ? (
-                                  <Icon name="check" size={14} />
-                                ) : (
-                                  d + 1
-                                )}
-                              </span>
-                              <span>{session(wi, d).title}</span>
-                              <Icon name="chevron" size={15} />
-                            </button>
-                          ))}
-                        </div>
-                        <p className="communication-note">
-                          <Icon name="speak" size={16} /> Speaking focus:{' '}
-                          {communication[wi][0]}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </section>
-      ))}
-      <p className="endnote">The goal is capability, not a perfect streak.</p>
     </div>
   )
 }
