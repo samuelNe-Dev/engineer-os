@@ -806,49 +806,63 @@ function Speak({
     confidence: 'I finished my thoughts without trailing off.',
   }
   return (
-    <div className="screen speak-screen">
-      <div className="eyebrow">Your voice is a skill</div>
-      <h1>Make yourself clear.</h1>
-      <div className="focus-line">
-        <span className="tag">Week {week + 1}</span>
+    <div
+      className={`screen speak-screen${started ? ' is-started' : ''}${finished ? ' is-finished' : ''}${saved ? ' is-saved' : ''}`}
+    >
+      <header className="speak-header">
+        <div>
+          <div className="eyebrow">Communication practice · Week {week + 1}</div>
+          <h1>Say it clearly.</h1>
+        </div>
+      </header>
+
+      <div className="speak-focus">
+        <Icon name="speak" size={15} />
         <span>{communication[week][0]}</span>
       </div>
-      <div className="speaking-prompt">
-        <span className="eyebrow">Today’s prompt</span>
-        <h2>{prompt}</h2>
-        <button
-          className="text-button"
-          disabled={started && !saved}
-          onClick={() => {
-            setPromptIndex((promptIndex + 1) % 3)
-            reset()
-          }}
-        >
-          Try another prompt <Icon name="reset" size={14} />
-        </button>
-      </div>
-      <details className="speaking-guide">
-        <summary>
-          Give your thoughts a structure <Icon name="down" size={17} />
-        </summary>
-        <ol className="framework">
-          {[
-            ['Statement', 'The main point is…'],
-            ['Reason', 'This matters because…'],
-            ['Example', 'For example, in my tracker…'],
-            ['Consequence', 'So the trade-off / next step is…'],
-          ].map(([name, example], i) => (
-            <li key={name}>
-              <span>{i + 1}</span>
-              <div>
-                <strong>{name}</strong>
-                <p>{example}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-        <p className="speaking-tip">{communication[week][1]}</p>
-      </details>
+
+      <section className="speak-prompt-card" aria-labelledby="speaking-prompt-title">
+        <div className="speak-prompt-top">
+          <span className="eyebrow">Your prompt</span>
+          <button
+            className="text-button"
+            disabled={started && !saved}
+            onClick={() => {
+              setPromptIndex((promptIndex + 1) % 3)
+              reset()
+            }}
+          >
+            New prompt <Icon name="reset" size={14} />
+          </button>
+        </div>
+        <h2 id="speaking-prompt-title">{prompt}</h2>
+        <p className="speak-framework-line">
+          Point → Reason → Example → Consequence
+        </p>
+        <details className="speaking-guide">
+          <summary>
+            Need a structure? <Icon name="down" size={16} />
+          </summary>
+          <ol className="framework">
+            {[
+              ['Statement', 'The main point is…'],
+              ['Reason', 'This matters because…'],
+              ['Example', 'For example, in my tracker…'],
+              ['Consequence', 'So the trade-off / next step is…'],
+            ].map(([name, example], i) => (
+              <li key={name}>
+                <span>{i + 1}</span>
+                <div>
+                  <strong>{name}</strong>
+                  <p>{example}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p className="speaking-tip">{communication[week][1]}</p>
+        </details>
+      </section>
+
       <div className="timer-panel">
         <div className="timer-pet">
           <Leo

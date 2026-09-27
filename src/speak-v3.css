@@ -1,0 +1,222 @@
+/* Speak v3: one focused practice surface before reflection. */
+.speak-screen {
+  padding-top: 14px;
+}
+
+.speak-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  min-height: 61px;
+}
+
+.speak-header h1 {
+  margin-top: 7px;
+  font-size: 28px;
+  line-height: 1.12;
+}
+
+.speak-focus {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 13px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  background: #ebeee5;
+  color: #53614e;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.speak-focus svg {
+  color: var(--green);
+}
+
+.speak-prompt-card {
+  padding: 15px 0 12px;
+  border-top: 1px solid var(--line);
+}
+
+.speak-prompt-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.speak-prompt-top .text-button {
+  min-height: 36px;
+  padding: 4px 0;
+  font-size: 11px;
+}
+
+.speak-prompt-card h2 {
+  margin-top: 6px;
+  font-size: 20px;
+  line-height: 1.28;
+  letter-spacing: -0.45px;
+}
+
+.speak-framework-line {
+  margin-top: 9px;
+  color: #617056;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.speak-prompt-card .speaking-guide {
+  margin: 6px 0 0;
+  border-top: 0;
+  font-size: 11px;
+}
+
+.speak-prompt-card .speaking-guide summary {
+  min-height: 36px;
+  justify-content: flex-start;
+  gap: 7px;
+  color: var(--green);
+}
+
+.speak-prompt-card .framework {
+  padding-top: 3px;
+}
+
+.speak-prompt-card .framework li {
+  margin: 10px 0;
+}
+
+.speak-prompt-card .framework li > span {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+}
+
+.speak-prompt-card .framework strong {
+  font-size: 12px;
+}
+
+.speak-prompt-card .framework p {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.speak-prompt-card .speaking-tip {
+  margin: 13px 0 4px;
+  font-size: 11px;
+}
+
+.speak-screen .timer-panel {
+  padding: 18px 20px 17px;
+  border-radius: 16px;
+}
+
+.speak-screen .timer-pet {
+  right: 12px;
+  top: 0;
+  width: 66px;
+  height: 72px;
+}
+
+.speak-screen .timer-top {
+  min-height: 31px;
+  padding-right: 65px;
+}
+
+.speak-screen .timer {
+  margin: 0 0 1px;
+  font-size: 62px;
+  line-height: 1.16;
+}
+
+.speak-screen .duration-picker {
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.speak-screen .duration-picker button {
+  min-width: 54px;
+  min-height: 38px;
+  font-size: 11px;
+}
+
+.speak-screen .timer-start {
+  min-height: 46px;
+}
+
+.speak-screen .finish-early {
+  min-height: 38px;
+  margin-top: 7px;
+  font-size: 11px;
+}
+
+.speak-screen .privacy-note {
+  margin: 8px 0 0;
+  font-size: 9px;
+}
+
+.speak-screen:not(.is-finished):not(.is-saved) .last-practice {
+  display: none;
+}
+
+/* Once practice ends, the reflection becomes the content. Scrolling is expected here. */
+.speak-screen.is-finished .speak-header,
+.speak-screen.is-finished .speak-focus,
+.speak-screen.is-finished .speak-prompt-card,
+.speak-screen.is-finished .privacy-note {
+  display: none;
+}
+
+.speak-screen.is-finished .timer-panel {
+  margin-top: 4px;
+}
+
+.speak-screen.is-finished .reflection {
+  margin-top: 24px;
+}
+
+.speak-screen.is-saved .speak-header,
+.speak-screen.is-saved .speak-focus,
+.speak-screen.is-saved .speak-prompt-card,
+.speak-screen.is-saved .privacy-note {
+  display: none;
+}
+
+.speak-screen.is-saved .timer-panel {
+  margin-top: 4px;
+}
+
+@media (max-width: 370px) {
+  .speak-header h1 {
+    font-size: 25px;
+  }
+
+  .speak-focus {
+    margin-top: 9px;
+    margin-bottom: 9px;
+  }
+
+  .speak-prompt-card {
+    padding-top: 11px;
+    padding-bottom: 8px;
+  }
+
+  .speak-prompt-card h2 {
+    font-size: 18px;
+  }
+
+  .speak-screen .timer-panel {
+    padding: 15px 17px 14px;
+  }
+
+  .speak-screen .timer {
+    font-size: 55px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .speak-screen * {
+    scroll-behavior: auto;
+  }
+}

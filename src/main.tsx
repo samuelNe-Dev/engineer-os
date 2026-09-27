@@ -4,6 +4,7 @@ import App from './App'
 import './styles.css'
 import './today-v3.css'
 import './roadmap-v3.css'
+import './speak-v3.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
