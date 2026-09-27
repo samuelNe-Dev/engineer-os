@@ -1080,25 +1080,32 @@ function Progress({
       isComplete(state.sessions[sessionId(w, d)]),
     ).every(Boolean),
   ).length
+
   return (
-    <div className="screen">
-      <div className="eyebrow">Proof of showing up</div>
-      <h1>Your work adds up.</h1>
-      <p className="page-intro">
-        Measure what you can do, not just what you’ve seen.
-      </p>
-      <section className="progress-overview">
-        <div className="progress-number">
-          {percent}
-          <span>%</span>
-          <div>
-            {complete === 0
-              ? 'Your starting point'
-              : complete === 144
-                ? 'A foundation to build on'
-                : 'Built one session at a time'}
+    <div className="screen progress-screen">
+      <header className="progress-header">
+        <div className="eyebrow">Progress</div>
+        <h1>See what’s getting stronger.</h1>
+      </header>
+
+      <section className="progress-hero" aria-label="Program progress">
+        <div className="progress-hero-top">
+          <div className="progress-percent">
+            {percent}
+            <span>%</span>
+          </div>
+          <div className="progress-hero-copy">
+            <strong>{complete} of 144 sessions</strong>
+            <span>
+              {complete === 0
+                ? 'Your baseline'
+                : complete === 144
+                  ? 'Program complete'
+                  : 'Built one session at a time'}
+            </span>
           </div>
         </div>
+
         <div
           className="progress-track"
           role="progressbar"
@@ -1109,14 +1116,11 @@ function Progress({
         >
           <span style={{ width: `${percent}%` }} />
         </div>
-        <p>{complete} of 144 sessions completed</p>
-        <div className="stats-row">
+
+        <div className="progress-stats">
           <div>
-            <strong>
-              {completedWeeks}
-              <span>/24</span>
-            </strong>
-            <span>Weeks complete</span>
+            <strong>{completedWeeks}<span>/24</span></strong>
+            <span>Weeks</span>
           </div>
           <div>
             <strong>{state.speaking.length}</strong>
@@ -1128,126 +1132,134 @@ function Progress({
           </div>
         </div>
       </section>
+
       {complete === 0 && (
-        <div className="empty-progress">
-          <p>
-            Your first session is the best place to start. Progress appears as
-            you understand, build and explain.
-          </p>
+        <div className="progress-empty">
+          <span>Your first completed session will show up here.</span>
           <button className="text-button" onClick={onToday}>
-            Go to today’s session <Icon name="arrow" size={16} />
+            Start today <Icon name="arrow" size={15} />
           </button>
         </div>
       )}
-      <section className="skills-section">
-        <div className="section-label">
-          <h2>What you can do</h2>
-          <span className="eyebrow">Self-assessed</span>
+
+      <section className="progress-section">
+        <div className="progress-section-heading">
+          <div>
+            <span className="eyebrow">Self-assessed</span>
+            <h2>Skills</h2>
+          </div>
+          <details className="skill-scale-help">
+            <summary>Levels</summary>
+            <p>Seen → Practiced → Can explain → Can build</p>
+          </details>
         </div>
-        <p className="muted skill-help">
-          Tap a skill to update it. Move up when you have evidence.
-        </p>
-        <div className="skill-legend">
-          Seen <span>→</span> Practiced <span>→</span> Can explain{' '}
-          <span>→</span> Can build
-        </div>
-        {skillNames.map((name, i) => {
-          const level = state.skills[i] ?? 0
-          return (
-            <div className="skill" key={name}>
-              <button
-                className="skill-toggle"
-                aria-expanded={openSkill === i}
-                onClick={() => setOpenSkill(openSkill === i ? null : i)}
-              >
-                <span>
-                  <strong>{name}</strong>
-                  <span className="skill-meter" aria-hidden="true">
-                    {[1, 2, 3, 4].map((n) => (
-                      <i className={n <= level ? 'filled' : ''} key={n} />
-                    ))}
+
+        <div className="progress-skill-list">
+          {skillNames.map((name, i) => {
+            const level = state.skills[i] ?? 0
+            return (
+              <div className="progress-skill" key={name}>
+                <button
+                  className="progress-skill-toggle"
+                  aria-expanded={openSkill === i}
+                  onClick={() => setOpenSkill(openSkill === i ? null : i)}
+                >
+                  <span className="progress-skill-main">
+                    <strong>{name}</strong>
+                    <span className="progress-skill-meter" aria-hidden="true">
+                      {[1, 2, 3, 4].map((n) => (
+                        <i className={n <= level ? 'filled' : ''} key={n} />
+                      ))}
+                    </span>
                   </span>
-                </span>
-                <span className="skill-level">
-                  {skillLevels[level]}
-                  <Icon name="down" size={14} />
-                </span>
-              </button>
-              {openSkill === i && (
-                <div className="skill-editor">
-                  <p>
-                    {
-                      [
-                        'No evidence yet. That’s your starting point.',
-                        'You recognize the concept and its purpose.',
-                        'You have attempted a concrete exercise.',
-                        'You can explain it unaided, including a trade-off.',
-                        'You can implement and test it independently.',
-                      ][level]
-                    }
-                  </p>
-                  <label htmlFor={`skill-${i}`}>Your current level</label>
-                  <select
-                    id={`skill-${i}`}
-                    value={level}
-                    onChange={(e) =>
-                      update((s) => ({
-                        ...s,
-                        skills: { ...s.skills, [i]: Number(e.target.value) },
-                      }))
-                    }
-                  >
-                    {skillLevels.map((label, n) => (
-                      <option value={n} key={label}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </section>
-      <section className="speaking-progress">
-        <div className="section-label">
-          <h2>Your speaking practice</h2>
-          <button
-            className="text-button"
-            onClick={() => setHistory(!history)}
-            aria-expanded={history}
-          >
-            {history ? 'Hide history' : 'View history'}
-          </button>
+                  <span className="progress-skill-level">
+                    {skillLevels[level]}
+                    <Icon name="down" size={14} />
+                  </span>
+                </button>
+
+                {openSkill === i && (
+                  <div className="progress-skill-editor">
+                    <p>
+                      {
+                        [
+                          'No evidence yet. That’s your starting point.',
+                          'You recognize the concept and its purpose.',
+                          'You have attempted a concrete exercise.',
+                          'You can explain it unaided, including a trade-off.',
+                          'You can implement and test it independently.',
+                        ][level]
+                      }
+                    </p>
+                    <label htmlFor={`skill-${i}`}>Current level</label>
+                    <select
+                      id={`skill-${i}`}
+                      value={level}
+                      onChange={(e) =>
+                        update((s) => ({
+                          ...s,
+                          skills: { ...s.skills, [i]: Number(e.target.value) },
+                        }))
+                      }
+                    >
+                      {skillLevels.map((label, n) => (
+                        <option value={n} key={label}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
+      </section>
+
+      <section className="progress-section speaking-progress-v3">
+        <div className="progress-section-heading">
+          <div>
+            <span className="eyebrow">Communication</span>
+            <h2>Speaking</h2>
+          </div>
+          {state.speaking.length > 0 && (
+            <button
+              className="text-button"
+              onClick={() => setHistory(!history)}
+              aria-expanded={history}
+            >
+              {history ? 'Hide history' : 'View history'}
+            </button>
+          )}
+        </div>
+
         {!state.speaking.length ? (
-          <p className="muted">
-            After your first practice, your ratings and reflections will appear
-            here.
-          </p>
+          <div className="progress-speaking-empty">
+            Your first speaking reflection will appear here.
+          </div>
         ) : (
           <>
-            <p className="muted">
-              Latest self-rating · {dateLabel(state.speaking[0].date)}
-            </p>
-            <div className="rating-summary">
-              {Object.entries(state.speaking[0].ratings).map(([key, value]) => (
-                <div key={key}>
-                  <span>{cap(key)}</span>
-                  <strong>
-                    {value}
-                    <span>/5</span>
-                  </strong>
-                </div>
-              ))}
+            <div className="progress-latest-speaking">
+              <div className="progress-latest-meta">
+                <span>Latest · {dateLabel(state.speaking[0].date)}</span>
+                <span>{Math.floor(state.speaking[0].seconds / 60)}m {state.speaking[0].seconds % 60}s</span>
+              </div>
+              <div className="progress-rating-grid">
+                {Object.entries(state.speaking[0].ratings).map(([key, value]) => (
+                  <div key={key}>
+                    <span>{cap(key)}</span>
+                    <strong>{value}<small>/5</small></strong>
+                  </div>
+                ))}
+              </div>
             </div>
+
             {history && (
-              <div className="practice-history">
+              <div className="practice-history progress-history">
                 {state.speaking.slice(0, 20).map((entry) => (
                   <article key={entry.id}>
                     <div className="eyebrow">
-                      {dateLabel(entry.date)} · {Math.floor(entry.seconds / 60)}
-                      m {entry.seconds % 60}s
+                      {dateLabel(entry.date)} · {Math.floor(entry.seconds / 60)}m {entry.seconds % 60}s
                     </div>
                     <p>{entry.prompt}</p>
                     <span className="history-ratings">
@@ -1259,19 +1271,13 @@ function Progress({
                   </article>
                 ))}
                 {state.speaking.length > 20 && (
-                  <p className="muted">
-                    Showing the 20 most recent practices. All entries are
-                    included in your backup.
-                  </p>
+                  <p className="muted">Showing the 20 most recent practices.</p>
                 )}
               </div>
             )}
           </>
         )}
       </section>
-      <p className="endnote">
-        Rest days matter. A streak is context, not a grade.
-      </p>
     </div>
   )
 }
