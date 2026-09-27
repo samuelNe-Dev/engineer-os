@@ -48,7 +48,7 @@ test('daily session flows through building, speaking, ratings and persistent com
   await page.getByRole('button', { name: 'View history' }).click()
   await expect(page.locator('blockquote')).toHaveText('Pause between ideas.')
   await page.getByRole('button', { name: 'C# / .NET' }).click()
-  await page.getByLabel('Your current level').selectOption('3')
+  await page.getByLabel('Current level').selectOption('3')
   await page.reload()
   await expect(page.getByRole('button', { name: 'C# / .NET' })).toContainText(
     'Can explain',
