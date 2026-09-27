@@ -1343,15 +1343,19 @@ function Settings({
   return (
     <dialog
       ref={dialog}
-      className="settings-dialog"
+      className="settings-dialog settings-v3-dialog"
       onCancel={onClose}
       onClick={(e) => {
         if (e.target === dialog.current) onClose()
       }}
     >
-      <div className="settings-content">
-        <div className="dialog-header">
-          <h2>Make it yours.</h2>
+      <div className="settings-sheet-handle" aria-hidden="true" />
+      <div className="settings-content settings-v3-content">
+        <header className="settings-v3-header">
+          <div>
+            <span className="eyebrow">Engineer OS</span>
+            <h2>Settings</h2>
+          </div>
           <button
             className="icon-button"
             aria-label="Close settings"
@@ -1359,9 +1363,10 @@ function Settings({
           >
             <Icon name="close" />
           </button>
-        </div>
-        <p className="muted">A program that fits around your life.</p>
+        </header>
+
         <form
+          className="settings-v3-section"
           onSubmit={(e) => {
             e.preventDefault()
             if (!validDate(start)) {
@@ -1375,7 +1380,14 @@ function Settings({
             onClose()
           }}
         >
-          <label className="input-label" htmlFor="start-date">
+          <div className="settings-v3-section-title">
+            <div>
+              <span className="eyebrow">Schedule</span>
+              <h3>Program start</h3>
+            </div>
+          </div>
+
+          <label className="settings-v3-label" htmlFor="start-date">
             Program start date
           </label>
           <input
@@ -1385,21 +1397,35 @@ function Settings({
             value={start}
             onChange={(e) => setStart(e.target.value)}
           />
-          <p className="field-help">
-            Moving the start date shifts your schedule. Your completed sessions
-            stay completed.
+          <p className="settings-v3-help">
+            Shifts your calendar without changing completed work.
           </p>
-          <button className="primary" type="submit">
+          <button
+            className="primary settings-v3-save"
+            type="submit"
+            disabled={start === state.startDate}
+          >
             Save start date <Icon name="check" size={18} />
           </button>
         </form>
-        <section className="settings-section">
-          <h3>Your progress belongs to you.</h3>
-          <p>
-            Progress is stored in this browser on this device. It does not sync
-            between devices. Clearing website data can remove it.
+
+        <section className="settings-v3-section">
+          <div className="settings-v3-section-title">
+            <div>
+              <span className="eyebrow">Data</span>
+              <h3>Progress & backup</h3>
+            </div>
+            <span className="settings-v3-state">
+              {error ? 'Needs attention' : 'On this device'}
+            </span>
+          </div>
+
+          <p className="settings-v3-help settings-v3-help-top">
+            Your progress stays in this browser. Export a backup before
+            switching devices or browsers.
           </p>
-          <div className="backup-actions">
+
+          <div className="settings-v3-actions">
             <button className="secondary" onClick={exportBackup}>
               Export backup
             </button>
@@ -1407,6 +1433,7 @@ function Settings({
               Restore backup
             </button>
           </div>
+
           <input
             ref={file}
             hidden
@@ -1414,35 +1441,39 @@ function Settings({
             accept=".json,application/json"
             onChange={(e) => void importFile(e.target.files?.[0])}
           />
+
           {pending && (
-            <div className="restore-confirm">
+            <div className="restore-confirm settings-v3-confirm">
               <p>
                 Replace current progress with this backup? It contains{' '}
                 {Object.values(pending.sessions).filter(isComplete).length}{' '}
                 completed sessions and {pending.speaking.length} speaking
                 practices.
               </p>
-              <button
-                className="primary"
-                onClick={() => {
-                  recover()
-                  update(pending)
-                  setStart(pending.startDate)
-                  setPending(null)
-                  onNotice('Backup restored.')
-                  onClose()
-                }}
-              >
-                Replace with backup
-              </button>
-              <button className="text-button" onClick={() => setPending(null)}>
-                Cancel
-              </button>
+              <div className="settings-v3-confirm-actions">
+                <button
+                  className="primary"
+                  onClick={() => {
+                    recover()
+                    update(pending)
+                    setStart(pending.startDate)
+                    setPending(null)
+                    onNotice('Backup restored.')
+                    onClose()
+                  }}
+                >
+                  Replace with backup
+                </button>
+                <button className="text-button" onClick={() => setPending(null)}>
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
+
           {error && (
             <button
-              className="text-button"
+              className="text-button settings-v3-recovery"
               onClick={() => {
                 if (
                   window.confirm(
@@ -1458,32 +1489,41 @@ function Settings({
               Use current progress and re-enable saving
             </button>
           )}
+
           {message && (
             <p className="error-text" role="alert">
               {message}
             </p>
           )}
         </section>
-        <section className="settings-section">
-          <h3>Keep it on your Home Screen.</h3>
-          <p>
-            On iPhone, open the deployed app in Safari. Tap Share, then Add to
-            Home Screen. Enable Open as Web App if offered, then tap Add.
-          </p>
-          <p className="field-help">
-            {offlineReady
-              ? 'Offline mode is ready.'
-              : 'Open the deployed app online once to prepare offline mode.'}{' '}
-            External learning resources still need a connection. Export a backup
-            before switching browsers or opening as a new Home Screen app;
-            restore it there if needed.
-          </p>
-        </section>
-        <p className="settings-version">
+
+        <details className="settings-v3-section settings-v3-install">
+          <summary>
+            <span>
+              <span className="eyebrow">App</span>
+              <strong>Home Screen & offline</strong>
+            </span>
+            <span className={`settings-v3-dot ${offlineReady ? 'ready' : ''}`} />
+            <Icon name="down" size={16} />
+          </summary>
+          <div className="settings-v3-install-body">
+            <p>
+              On iPhone, open Engineer OS in Safari, tap Share, then Add to Home
+              Screen.
+            </p>
+            <p>
+              {offlineReady
+                ? 'Offline mode is ready on this device.'
+                : 'Open the deployed app online once to prepare offline mode.'}
+            </p>
+            <p>External learning resources still need a connection.</p>
+          </div>
+        </details>
+
+        <footer className="settings-v3-footer">
           Engineer OS · v1.0
-          <br />
-          Built for deliberate practice.
-        </p>
+          <span>Deliberate practice, one session at a time.</span>
+        </footer>
       </div>
     </dialog>
   )

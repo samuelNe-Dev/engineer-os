@@ -6,6 +6,7 @@ import './today-v3.css'
 import './roadmap-v3.css'
 import './speak-v3.css'
 import './progress-v3.css'
+import './settings-v3.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
