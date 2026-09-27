@@ -129,7 +129,7 @@ test('app reloads offline after installation with saved state and packaged icons
   if (!isolated) await expect(page.getByText('You’re offline.')).toBeVisible()
   await page.getByRole('link', { name: 'Roadmap', exact: true }).click()
   await expect(
-    page.getByRole('heading', { name: 'Show what you can do' }),
+    page.getByRole('heading', { name: 'Your path, at a glance.' }),
   ).toBeVisible()
   if (!isolated) await context.setOffline(false)
   for (const path of [
